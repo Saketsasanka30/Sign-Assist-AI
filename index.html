@@ -30,6 +30,17 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <script>
+      // Automatically redirect to /docs/ if hosted on GitHub Pages root
+      // to serve precompiled production bundle instead of uncompiled .tsx
+      if (
+        window.location.hostname.includes("github.io") &&
+        !window.location.pathname.includes("/docs")
+      ) {
+        var base = window.location.pathname.replace(/\/$/, "");
+        window.location.replace(base + "/docs/");
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

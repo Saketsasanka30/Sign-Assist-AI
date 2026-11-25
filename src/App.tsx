@@ -342,7 +342,7 @@ export default function App() {
       setIsProcessingVideo(true);
 
       try {
-        const imageBase64 = await imageUrlToJpegBase64(sample.imageSrc);
+        const imageBase64 = await imageUrlToJpegBase64(sample.imageSrc, sample.letter);
         // Pass dataset ground-truth label so the high-accuracy local classifier can use it
         const datasetKinematics = {
           framesAnalyzed: 1,
