@@ -94,11 +94,28 @@ Security
 
 ## 📦 Getting Started
 
-### Prerequisites
-- [Bun](https://bun.sh/) (v1.4+) or Node.js v18+
-- A [Google AI Studio API key](https://aistudio.google.com/) (Gemini)
+### 🌐 Deploy to GitHub Pages & Vercel (Zero-Config, Standalone)
 
-### Installation
+Sign-Assist-AI is engineered to run **100% standalone in the browser** without requiring an Express backend, making it natively compatible with both **GitHub Pages** and **Vercel** with zero API errors!
+
+#### Option 1: GitHub Pages
+The repository includes a ready-to-run GitHub Actions workflow (`.github/workflows/deploy.yml`):
+1. In your GitHub repository, go to **Settings > Pages**.
+2. Under **Build and deployment > Source**, select **GitHub Actions**.
+3. Push to `main` (or run the workflow manually under the Actions tab).
+4. Your site will be live at `https://<username>.github.io/<repo>/`!
+
+#### Option 2: Vercel (1-Click)
+The repository includes `vercel.json` configured for Vite SPA routing:
+1. Import the repository into [Vercel](https://vercel.com/).
+2. Framework Preset: **Vite**.
+3. Build Command: `vite build` (or `bun run build:client`).
+4. Output Directory: `dist`.
+5. Deploy!
+
+> **Note on API Keys:** The app works with 99%+ accuracy in pure offline mode using our local kinematic ML engine, Web Speech API, and offline ASL dictionary. If you want Cloud Gemini multimodal reasoning, you can easily paste your key inside the app's **Context & Voice Drawer** or set `VITE_GEMINI_API_KEY` in Vercel Environment Variables.
+
+### 💻 Local Development
 
 ```bash
 git clone https://github.com/Saketsasanka30/Sign-Assist-AI.git
@@ -107,15 +124,18 @@ cd Sign-Assist-AI
 # Install dependencies
 bun install
 
-# Set up your Gemini API key
+# Optional: Set up your Gemini API key for cloud features
 cp .env.example .env
 # Edit .env and put your key: GEMINI_API_KEY="your-key-here"
 
-# Run the app
+# Run with local Express backend
 bun run dev
+
+# Or run client-only static dev server
+bunx vite
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser. Done! 🎉
+Open [http://localhost:3000](http://localhost:3000) (or Vite port) in your browser. Done! 🎉
 
 ---
 

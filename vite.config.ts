@@ -5,6 +5,8 @@ import { defineConfig } from 'vite';
 
 export default defineConfig(({ mode }) => {
   return {
+    // Relative base ensures asset URLs resolve properly on GitHub Pages subpaths and Vercel root
+    base: './',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
@@ -12,23 +14,17 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
+      // HMR is disabled in AI Studio via DISABLE_HMR env var
       hmr: process.env.DISABLE_HMR !== 'true',
-      headers: {
-        // Required for SharedArrayBuffer / WebAssembly threading used by MediaPipe
-        'Cross-Origin-Opener-Policy': 'same-origin',
-        'Cross-Origin-Embedder-Policy': 'require-corp',
-      },
     },
-    // Ensure MediaPipe WASM files are served with correct MIME type
+    // Ensure MediaPipe WASM files and tasks are treated as assets
     assetsInclude: ['**/*.wasm', '**/*.task'],
     optimizeDeps: {
-      // Exclude mediapipe from bundling — it loads its WASM files dynamically at runtime
+      // MediaPipe loads its WASM runtime dynamically
       exclude: ['@mediapipe/tasks-vision'],
     },
     build: {
-      // Raise the chunk-size warning threshold to avoid false positives from MediaPipe
-      chunkSizeWarningLimit: 2000,
+      chunkSizeWarningLimit: 2500,
       rollupOptions: {
         output: {
           manualChunks: {

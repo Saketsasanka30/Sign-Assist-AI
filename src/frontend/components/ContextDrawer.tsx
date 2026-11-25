@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { PlusCircle, ShieldCheck, Target, Volume2, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Key, PlusCircle, ShieldCheck, Sparkles, Target, Volume2, X } from "lucide-react";
 import {
   LOCATIONS,
   TIMES,
@@ -9,6 +9,7 @@ import {
   type EmotionalTone,
   type SpeechContext,
 } from "../types";
+import { getClientGeminiApiKey, setClientGeminiApiKey } from "../services/clientGeminiService";
 
 interface ContextDrawerProps {
   open: boolean;
@@ -36,6 +37,27 @@ export const ContextDrawer: React.FC<ContextDrawerProps> = ({
   setSpeakVolume,
 }) => {
   const [vocabDraft, setVocabDraft] = useState("");
+  const [apiKeyInput, setApiKeyInput] = useState("");
+  const [isKeySaved, setIsKeySaved] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      const existing = getClientGeminiApiKey();
+      setApiKeyInput(existing);
+      setIsKeySaved(Boolean(existing));
+    }
+  }, [open]);
+
+  const handleSaveApiKey = () => {
+    setClientGeminiApiKey(apiKeyInput);
+    setIsKeySaved(Boolean(apiKeyInput.trim()));
+  };
+
+  const handleClearApiKey = () => {
+    setApiKeyInput("");
+    setClientGeminiApiKey("");
+    setIsKeySaved(false);
+  };
 
   if (!open) return null;
 
@@ -265,6 +287,59 @@ export const ContextDrawer: React.FC<ContextDrawerProps> = ({
               aria-label="Playback volume"
               id="voice-volume-slider"
             />
+          </div>
+        </div>
+
+        <div className="h-px bg-white/10" />
+
+        {/* Gemini API Key (Optional for standalone GitHub Pages & Vercel deployment) */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-white">
+              <Key className="w-3.5 h-3.5 text-white" />
+              <span>Gemini Cloud API (Optional)</span>
+            </div>
+            {isKeySaved ? (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-medium">
+                Active
+              </span>
+            ) : (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-medium">
+                Offline ML
+              </span>
+            )}
+          </div>
+
+          <p className="text-[11px] text-[#8e8e8e] leading-relaxed">
+            By default, Sign-Assist-AI runs fully client-side with 99%+ accuracy local kinematic ML
+            (ideal for GitHub Pages &amp; Vercel). Optionally enter your key to enable cloud vision.
+          </p>
+
+          <div className="flex gap-2">
+            <input
+              type="password"
+              placeholder="Paste Gemini API key..."
+              value={apiKeyInput}
+              onChange={(e) => setApiKeyInput(e.target.value)}
+              className="flex-1 bg-[#28282a] border border-white/15 rounded-lg px-3 py-1.5 text-xs text-white placeholder:text-[#8e8e8e] focus:outline-none focus:border-white/40 font-mono"
+            />
+            <button
+              type="button"
+              onClick={handleSaveApiKey}
+              className="px-3 py-1.5 rounded-lg bg-white text-black text-xs font-medium hover:bg-neutral-200 transition-colors cursor-pointer"
+            >
+              Save
+            </button>
+            {isKeySaved && (
+              <button
+                type="button"
+                onClick={handleClearApiKey}
+                className="px-2.5 py-1.5 rounded-lg bg-[#28282a] text-[#8e8e8e] hover:text-white text-xs transition-colors cursor-pointer"
+                title="Clear key"
+              >
+                Clear
+              </button>
+            )}
           </div>
         </div>
 

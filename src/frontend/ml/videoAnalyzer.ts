@@ -48,7 +48,19 @@ async function getHandLandmarker(): Promise<HandLandmarker | null> {
   if (!landmarkerPromise) {
     landmarkerPromise = (async () => {
       try {
-        const vision = await FilesetResolver.forVisionTasks("/mediapipe/wasm");
+        let vision: any = null;
+        const baseUrl = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+        const localWasmPath = `${baseUrl}/mediapipe/wasm`;
+
+        try {
+          vision = await FilesetResolver.forVisionTasks(localWasmPath);
+        } catch {
+          // CDN fallback for GitHub Pages, Vercel, and subpath deployments
+          vision = await FilesetResolver.forVisionTasks(
+            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm"
+          );
+        }
+
         const modelPromise = HandLandmarker.createFromOptions(vision, {
           baseOptions: {
             modelAssetPath:
@@ -57,13 +69,13 @@ async function getHandLandmarker(): Promise<HandLandmarker | null> {
           },
           runningMode: "IMAGE",
           numHands: 2,
-          minHandDetectionConfidence: 0.42,
-          minHandPresenceConfidence: 0.42,
-          minTrackingConfidence: 0.42,
+          minHandDetectionConfidence: 0.4,
+          minHandPresenceConfidence: 0.4,
+          minTrackingConfidence: 0.4,
         });
 
         const timeoutPromise = new Promise<null>((resolve) =>
-          setTimeout(() => resolve(null), 7000)
+          setTimeout(() => resolve(null), 8000)
         );
         return await Promise.race([modelPromise, timeoutPromise]);
       } catch {

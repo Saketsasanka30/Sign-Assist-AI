@@ -163,19 +163,65 @@ export default function App() {
   const speakText = async (textToSpeak: string) => {
     if (!textToSpeak || isSynthesizing) return;
     setIsSynthesizing(true);
-    const audioUrl = await synthesizeSpeech(
-      textToSpeak,
-      selectedVoice,
-      speakVolume,
-      1.0,
-      selectedTone
-    );
-    if (audioUrl) {
-      const audio = new Audio(audioUrl);
-      audio.volume = speakVolume;
-      audio.play().catch(() => {});
+
+    try {
+      // 1. Primary zero-latency playback: Web Speech API (supported universally in all browsers)
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.volume = speakVolume;
+
+        // Tune rate and pitch based on emotional tone selection
+        if (selectedTone === "Calm") {
+          utterance.rate = 0.88;
+          utterance.pitch = 0.95;
+        } else if (selectedTone === "Friendly") {
+          utterance.rate = 1.02;
+          utterance.pitch = 1.08;
+        } else if (selectedTone === "Professional") {
+          utterance.rate = 0.95;
+          utterance.pitch = 1.0;
+        } else if (selectedTone === "Empathetic") {
+          utterance.rate = 0.85;
+          utterance.pitch = 1.0;
+        }
+
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+          const match =
+            voices.find((v) => v.name.toLowerCase().includes(selectedVoice.toLowerCase())) ||
+            voices.find((v) => v.lang.startsWith("en") && v.name.includes("Natural")) ||
+            voices.find((v) => v.lang.startsWith("en"));
+          if (match) utterance.voice = match;
+        }
+
+        utterance.onend = () => setIsSynthesizing(false);
+        utterance.onerror = () => setIsSynthesizing(false);
+
+        window.speechSynthesis.speak(utterance);
+        return;
+      }
+
+      // 2. Fallback to server neural TTS if Web Speech is unavailable
+      const audioUrl = await synthesizeSpeech(
+        textToSpeak,
+        selectedVoice,
+        speakVolume,
+        1.0,
+        selectedTone
+      );
+      if (audioUrl) {
+        const audio = new Audio(audioUrl);
+        audio.volume = speakVolume;
+        audio.onended = () => setIsSynthesizing(false);
+        audio.onerror = () => setIsSynthesizing(false);
+        await audio.play().catch(() => setIsSynthesizing(false));
+      } else {
+        setIsSynthesizing(false);
+      }
+    } catch {
+      setIsSynthesizing(false);
     }
-    setIsSynthesizing(false);
   };
 
   const stopCamera = useCallback(() => {
