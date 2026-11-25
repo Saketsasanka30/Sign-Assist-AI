@@ -1,0 +1,11 @@
+{
+  "name": "Sign Language & Speech Assistant",
+  "description": "An interactive tool for sign language translation and speech reconstruction using AI.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
