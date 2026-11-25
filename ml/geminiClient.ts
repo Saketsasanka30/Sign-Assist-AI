@@ -3,10 +3,13 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+export const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+
 let cachedAiClient: GoogleGenAI | null = null;
 
 export function hasGeminiApiKey(): boolean {
-  return Boolean(process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim().length > 0);
+  const key = process.env.GEMINI_API_KEY?.trim();
+  return Boolean(key && key.length > 0 && key !== "MY_GEMINI_API_KEY");
 }
 
 export function getGeminiClient(): GoogleGenAI {
@@ -32,7 +35,7 @@ export function getGeminiClient(): GoogleGenAI {
 export async function generateWithRetry<T>(
   fn: () => Promise<T>,
   maxRetries = 3,
-  initialDelay = 2000
+  initialDelay = 1500
 ): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt < maxRetries; attempt++) {

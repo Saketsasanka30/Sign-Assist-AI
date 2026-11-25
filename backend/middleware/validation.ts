@@ -110,6 +110,16 @@ export function validateTranslateVideo(req: Request, res: Response, next: NextFu
           verticalZone: String(kinematicSummary.verticalZone || "").slice(0, 64),
           handedness: String(kinematicSummary.handedness || "").slice(0, 64),
           fingerCurlSummary: String(kinematicSummary.fingerCurlSummary || "").slice(0, 160),
+          // Extended: ground-truth label and letter from Hugging Face dataset
+          datasetLabel:
+            typeof kinematicSummary.datasetLabel === "number"
+              ? kinematicSummary.datasetLabel
+              : undefined,
+          datasetLetter:
+            typeof kinematicSummary.datasetLetter === "string" &&
+            /^[A-Z]$/i.test(kinematicSummary.datasetLetter.trim())
+              ? kinematicSummary.datasetLetter.trim().toUpperCase()
+              : undefined,
         }
       : undefined;
 

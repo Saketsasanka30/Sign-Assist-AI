@@ -4,5 +4,25 @@ dist/
 coverage/
 .DS_Store
 *.log
-.env*
+
+# Environment secrets — never commit!
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep the example for reference
 !.env.example
+
+# Bun lock is intentionally committed for reproducibility
+# bun.lock — keep
+
+# OS / Editor artifacts
+Thumbs.db
+.vscode/
+.idea/
+
+# Temporary
+*.tmp
+*.swp
